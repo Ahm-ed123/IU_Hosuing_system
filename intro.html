@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intro - IU Housing System</title>
+  <link rel="stylesheet" href="style2.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #002147;
+      color: white;
+      overflow: hidden;
+    }
+
+    .logo-container img {
+      width: 250px; /* تم تكبير العرض */
+      height: auto;
+      opacity: 0;
+      transform: scale(0.8);
+      animation: fadeInScale 1.5s ease forwards;
+    }
+
+    .intro-container {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 5px;
+      margin-top: 30px; /* زيادة المسافة بين الشعار والنص */
+    }
+
+    .intro-text span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="l.png" alt="IU Housing System Logo">
+  </div>
+  <div class="intro-container">
+    <div class="intro-text" id="intro-text"></div>
+  </div>
+
+  <script>
+    const text = "IU HOUSING SYSTEM";
+    const container = document.getElementById("intro-text");
+
+    text.split("").forEach((char, index) => {
+      const span = document.createElement("span");
+      span.textContent = char === " " ? "\u00A0" : char; // Handle spaces
+      span.style.animationDelay = `${index * 0.2}s`;
+      container.appendChild(span);
+    });
+
+    // Redirect to the home page after the animation ends
+    setTimeout(() => {
+      window.location.href = "home.php"; // Replace with your home page URL
+    }, (text.length * 0.2 + 2) * 1000); // Adjust time to match animation
+  </script>
+</body>
+</html>

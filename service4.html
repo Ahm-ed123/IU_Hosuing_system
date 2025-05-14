@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تجديد العقد / إخلاء الطرف</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #f4f4f9, #ffffff);
+      color: #333;
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+
+    /* شريط التنقل */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px 30px;
+      background: #1e1e2f; /* خلفية شريط التنقل */
+      color: white;
+      z-index: 1000;
+    }
+
+    .navbar h1 {
+      font-size: 24px;
+      margin: 0;
+      position: absolute;
+      left: 30px; /* إبقاء العنوان على اليسار */
+      color: #ffcc00; /* لون كلمة نظام السكن */
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      margin-left: 80px; /* إضافة مساحة بين العنوان والروابط */
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #ffcc00; /* تدرج اللون عند التمرير */
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block; /* عرض القائمة عند التمرير */
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #ddd; /* تغيير الخلفية عند التمرير */
+    }
+
+    .section {
+      padding: 100px 20px;
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: center;
+      gap: 20px; /* مسافة بين المربعين */
+    }
+
+    .option-box {
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      width: 250px; /* عرض ثابت للمربع */
+      text-align: center;
+      background: #f8f9fa;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .option-box:hover {
+      background: #ffcc00; /* تغيير الخلفية إلى الأصفر عند التمرير */
+      transform: scale(1.05); /* تكبير المربع عند التمرير */
+    }
+
+    .option-box h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .option-box p {
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .option-box button {
+      background: #ffcc00; /* لون الزر */
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .option-box button:hover {
+      background: #e6b800; /* لون أغمق عند التمرير */
+    }
+
+    /* نمط النافذة المنبثقة */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1000; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgba(0, 0, 0, 0.7); 
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto; 
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; 
+      max-width: 600px; 
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* نموذج الإخلاء */
+    .reason-input {
+      margin: 15px 0;
+      width: 80%; /* تصغير عرض مربع السبب */
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+      height: 40px; /* تصغير الارتفاع */
+    }
+
+    .file-input {
+      margin: 15px 0;
+    }
+
+    .confirmation-modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1000; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgba(0, 0, 0, 0.4); 
+      padding-top: 60px;
+    }
+
+    .confirmation-content {
+      background-color: #fefefe;
+      margin: 15% auto; 
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; 
+      max-width: 400px; 
+    }
+  </style>
+</head>
+<body>
+
+<!-- شريط التنقل -->
+<div class="navbar">
+  <h1 id="navbar-title">نظام السكن</h1>
+  <div class="nav-links">
+      <a href="#">HOME</a>
+      <a href="#" id="aboutBtn">ABOUT</a>
+      <div class="dropdown">
+          <a href="#">SERVICES</a>
+          <div class="dropdown-content">
+              <a href="#" onclick="scrollToService('service1')">حجز غرفة</a>
+              <a href="#" onclick="scrollToService('service2')">طلب صيانة</a>
+              <a href="#" onclick="scrollToService('service3')">تقديم شكوى</a>
+              <a href="#" onclick="scrollToService('service4')">تجديد / إخلاء عقد</a>
+          </div>
+      </div>
+      <a href="#">Track Request</a>
+      <a href="#">PAGES</a>
+  </div>
+</div>
+
+<!-- قسم التجديد والإخلاء -->
+<section class="section">
+  <h2>اختر الخيار المطلوب:</h2>
+  <div class="options">
+    <div class="option-box" onclick="showRenewInfo()">
+      <h3>تجديد عقد</h3>
+      <p>يمكنك تجديد عقدك أو تقديم طلب لإخلاء الطرف بسهولة.</p>
+      <button>قم بالتقديم الآن</button>
+    </div>
+    <div class="option-box" onclick="showClearanceInfo()">
+      <h3>إخلاء طرف</h3>
+      <p>تقديم طلب إخلاء الطرف بشكل سريع وسهل.</p>
+      <button>قم بالتقديم الآن</button>
+    </div>
+  </div>
+
+  <div class="renew-info" id="renew-info" style="display: none; margin-top: 20px;">
+    <h3>اختر الفصل الدراسي:</h3>
+    <select id="semester-select">
+      <option value="">اختر...</option>
+      <option value="first">ترم أول</option>
+      <option value="second">ترم ثاني</option>
+      <option value="summer">صيفي</option>
+    </select>
+    <div class="payment-info" id="payment-info" style="display: none;">
+      <h3>قيمة الترم: <span id="term-fee">1000</span> ريال</h3>
+      <div class="terms">
+        <h4>الشروط والأحكام:</h4>
+        <span class="terms-link" id="show-terms">عرض الشروط والأحكام</span>
+        <label>
+          <input type="checkbox" id="accept-terms">
+          أوافق على الشروط والأحكام
+        </label>
+      </div>
+      <button id="continue-button" disabled>متابعة</button>
+    </div>
+  </div>
+
+  <div class="clearance-info" id="clearance-info" style="display: none; margin-top: 20px;">
+    <h3>إخلاء الطرف:</h3>
+    <p>يرجى ملء النموذج في الأسفل لتقديم طلب إخلاء الطرف.</p>
+    <div>
+      <span class="terms-link" id="show-clearance-terms">عرض شروط الإخلاء</span>
+      <textarea class="reason-input" id="reason" rows="2" placeholder="سبب الإخلاء" required></textarea> <!-- تصغير الارتفاع -->
+      <input type="file" class="file-input" id="room-image" accept="image/*" required>
+      <button id="submit-clearance">تقديم الطلب</button>
+      <!-- تمت إزالة كلمة "شروط والأحكام" -->
+    </div>
+  </div>
+</section>
+
+<!-- نافذة منبثقة لـ ABOUT -->
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2>معلومات عن موقع سكن الطلاب</h2>
+        <p>نظام السكن يقدم خدمات متعددة للطلاب، بما في ذلك حجز الغرف، طلبات الصيانة، وتقديم الشكاوى. هدفنا هو توفير بيئة مريحة وآمنة للطلاب، حيث يمكنهم التركيز على دراستهم وتطوير مهاراتهم.</p>
+    </div>
+</div>
+
+<!-- نافذة الشروط والأحكام -->
+<div id="termsModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>الشروط والأحكام</h2>
+    <ul>
+      <li>يجب دفع الرسوم في الوقت المحدد.</li>
+      <li>لا يمكن استرداد الرسوم بعد التسجيل.</li>
+      <li>يجب الالتزام بالقوانين واللوائح.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- نافذة شروط الإخلاء -->
+<div id="clearanceTermsModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>شروط الإخلاء</h2>
+    <ul>
+      <li>يجب تقديم طلب الإخلاء قبل انتهاء المدة المحددة.</li>
+      <li>يجب التأكد من عدم وجود أي مستحقات مالية.</li>
+      <li>يجب تقديم سبب الإخلاء بصورة واضحة.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- نافذة تأكيد تقديم الطلب -->
+<div id="confirmationModal" class="confirmation-modal">
+  <div class="confirmation-content">
+    <h2>هل أنت متأكد من تقديم الطلب؟</h2>
+    <button id="confirm-submit">نعم</button>
+    <button id="cancel-submit">لا</button>
+  </div>
+</div>
+
+<script>
+  function showRenewInfo() {
+    document.getElementById('renew-info').style.display = 'block';
+    document.getElementById('clearance-info').style.display = 'none';
+  }
+
+  function showClearanceInfo() {
+    document.getElementById('clearance-info').style.display = 'block';
+    document.getElementById('renew-info').style.display = 'none';
+  }
+
+  const renewInfo = document.getElementById('renew-info');
+  const clearanceInfo = document.getElementById('clearance-info');
+  const semesterSelect = document.getElementById('semester-select');
+  const paymentInfo = document.getElementById('payment-info');
+  const termFee = document.getElementById('term-fee');
+  const continueButton = document.getElementById('continue-button');
+  const acceptTerms = document.getElementById('accept-terms');
+
+  semesterSelect.addEventListener('change', function() {
+    if (this.value === 'first' || this.value === 'second') {
+      paymentInfo.style.display = 'block';
+      termFee.innerText = '1000';
+    } else if (this.value === 'summer') {
+      paymentInfo.style.display = 'block';
+      termFee.innerText = '500';
+    } else {
+      paymentInfo.style.display = 'none';
+    }
+  });
+
+  acceptTerms.addEventListener('change', function() {
+    continueButton.disabled = !this.checked;
+  });
+
+  continueButton.addEventListener('click', function() {
+    window.location.href = 'payment.html'; // استبدل payment.html بصفحة الدفع الخاصة بك
+  });
+
+  // نافذة منبثقة لـ ABOUT
+  const aboutModal = document.getElementById("aboutModal");
+  const aboutBtn = document.getElementById("aboutBtn");
+  const closeAboutModal = document.getElementById("closeModal");
+
+  aboutBtn.onclick = function() {
+    aboutModal.style.display = "block";
+  }
+
+  closeAboutModal.onclick = function() {
+    aboutModal.style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    if (event.target === aboutModal || event.target === termsModal || event.target === clearanceTermsModal) {
+      aboutModal.style.display = "none";
+      termsModal.style.display = "none";
+      clearanceTermsModal.style.display = "none";
+    }
+  }
+
+  // نافذة الشروط والأحكام
+  const termsModal = document.getElementById("termsModal");
+  const showTerms = document.getElementById("show-terms");
+
+  showTerms.onclick = function() {
+    termsModal.style.display = "block";
+  }
+
+  // نافذة شروط الإخلاء
+  const clearanceTermsModal = document.getElementById("clearanceTermsModal");
+  const showClearanceTerms = document.getElementById("show-clearance-terms");
+
+  showClearanceTerms.onclick = function() {
+    clearanceTermsModal.style.display = "block";
+  }
+
+  // تقديم طلب إخلاء الطرف
+  const confirmationModal = document.getElementById("confirmationModal");
+  const submitClearance = document.getElementById("submit-clearance");
+  const confirmSubmit = document.getElementById("confirm-submit");
+  const cancelSubmit = document.getElementById("cancel-submit");
+
+  submitClearance.onclick = function() {
+    const roomImage = document.getElementById('room-image').files[0];
+
+    // تحقق من رفع ملف قبل تقديم الطلب
+    if (!roomImage) {
+      alert("يرجى رفع صورة قبل تقديم الطلب.");
+      return;
+    }
+
+    confirmationModal.style.display = "block";
+  }
+
+  confirmSubmit.onclick = function() {
+    const reason = document.getElementById('reason').value;
+    const randomNumber = Math.floor(Math.random() * 1000000); // توليد رقم عشوائي
+
+    // هنا يمكنك إرسال الطلب إلى الأدمن باستخدام الرقم العشوائي
+    alert(`تم تقديم الطلب بنجاح!\nرقم الطلب: ${randomNumber}\nسبب الإخلاء: ${reason}`);
+    confirmationModal.style.display = "none";
+    // يمكنك إعادة تعيين النموذج هنا إذا لزم الأمر
+    document.getElementById('reason').value = ''; // إعادة تعيين مربع النص
+    document.getElementById('room-image').value = ''; // إعادة تعيين حقل الصورة
+  }
+
+  cancelSubmit.onclick = function() {
+    confirmationModal.style.display = "none";
+  }
+</script>
+
+</body>
+</html>
